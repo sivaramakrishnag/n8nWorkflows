@@ -1,0 +1,485 @@
+{
+  "name": "n8nlinkedinpostbasic05092026",
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "months",
+              "triggerAtHour": 19
+            }
+          ]
+        }
+      },
+      "id": "a9e2a6e0-23bd-4a46-bcc4-d95ae7dbc3f5",
+      "name": "Schedule Trigger",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.4,
+      "position": [
+        -416,
+        -288
+      ]
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=Create a professional LinkedIn post with header,\n'The biggest mistake playwright engineers make'.\n\nThe post should:\n- Be engaging and easy to read\n- Be between 100 and 150 words\n- Start with a strong hook\n- Provide useful information\n- End with a question to encourage comments\n- Do not use excessive emojis",
+        "options": {
+          "systemMessage": "You are a professional LinkedIn content writer. Write engaging, well-structured posts based on the user instructions."
+        }
+      },
+      "id": "466e0cf9-f8b4-4975-b6b6-333d5ba218c0",
+      "name": "Content generator",
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3.1,
+      "position": [
+        -192,
+        -288
+      ]
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "mode": "list",
+          "value": "gpt-5-mini"
+        },
+        "builtInTools": {},
+        "options": {}
+      },
+      "id": "4873928d-c8e4-4dd5-b88a-122349acd587",
+      "name": "OpenAI Chat Model",
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.3,
+      "position": [
+        -128,
+        -64
+      ],
+      "credentials": {
+        "openAiApi": {
+          "id": null,
+          "name": "",
+          "__aiGatewayManaged": true
+        }
+      }
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=Use the content generator output: {{ $json.output }}",
+        "options": {
+          "systemMessage": "You are a LinkedIn post editor. Refine the provided draft into a polished, ready-to-publish LinkedIn post."
+        }
+      },
+      "id": "260106bd-36fd-4ef3-ba4f-103ec587cad9",
+      "name": "linkedin post",
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3.1,
+      "position": [
+        160,
+        -288
+      ]
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "mode": "list",
+          "value": "gpt-5-mini"
+        },
+        "builtInTools": {},
+        "options": {}
+      },
+      "id": "5b1c132f-d10c-4543-a586-f2693aa9a52c",
+      "name": "OpenAI Chat Model1",
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.3,
+      "position": [
+        240,
+        -64
+      ],
+      "credentials": {
+        "openAiApi": {
+          "id": null,
+          "name": "",
+          "__aiGatewayManaged": true
+        }
+      }
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $json.output }}",
+        "options": {
+          "systemMessage": "You are a helpful assistant. add 10 relevant hashtags at the end of the complete message. Keep the same hook or header. do not modify the input message"
+        }
+      },
+      "id": "3f703cef-05c1-4114-9022-e07da2571e1f",
+      "name": "add hashtag to content",
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3.1,
+      "position": [
+        512,
+        -288
+      ]
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "mode": "list",
+          "value": "gpt-5-mini"
+        },
+        "builtInTools": {},
+        "options": {}
+      },
+      "id": "28e225eb-7732-419d-a0ce-0580484ebad2",
+      "name": "OpenAI Chat Model3",
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.3,
+      "position": [
+        592,
+        -64
+      ],
+      "credentials": {
+        "openAiApi": {
+          "id": null,
+          "name": "",
+          "__aiGatewayManaged": true
+        }
+      }
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $json.output }}",
+        "options": {
+          "systemMessage": "You are a helpful assistant. correct any spelling mistakes and grammer mistakes. Remove all extra symbols etc. keep the header. do not change the message. pass it to linkedin post like one single post."
+        }
+      },
+      "id": "f64b92ce-171a-42df-a6b2-a2c589983dfa",
+      "name": "review post",
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3.1,
+      "position": [
+        864,
+        -128
+      ]
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "id": "43fcfeab-7187-4751-957f-b9d9536820ba",
+      "name": "Google Gemini Chat Model",
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1.1,
+      "position": [
+        944,
+        96
+      ],
+      "credentials": {
+        "googlePalmApi": {
+          "id": "dJ2Xxp0FcTWx1mhB",
+          "name": "Google Gemini(PaLM) Api account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "multiStep",
+        "operations": {
+          "operations": [
+            {
+              "operation": "create",
+              "backgroundColor": "#0a2540",
+              "width": 1080,
+              "height": 1350
+            },
+            {
+              "operation": "draw",
+              "color": "#1e88e5",
+              "startPositionX": 0,
+              "startPositionY": 0,
+              "endPositionX": 16,
+              "endPositionY": 1350
+            },
+            {
+              "operation": "text",
+              "text": "INSIGHT",
+              "fontSize": 28,
+              "fontColor": "#1e88e5",
+              "positionX": 70,
+              "positionY": 70,
+              "lineLength": 40
+            },
+            {
+              "operation": "text",
+              "text": "={{ $json.output.split(\"\\n\")[0].replace(/['\"]/g, \"\") }}",
+              "fontSize": 54,
+              "fontColor": "#ffffff",
+              "positionX": 70,
+              "positionY": 150,
+              "lineLength": 28
+            },
+            {
+              "operation": "text",
+              "text": "={{ $json.output.split(\"\\n\").slice(1).join(\"\\n\").replace(/#[\\w]+/g, \"\").trim() }}",
+              "fontSize": 30,
+              "fontColor": "#e0e6ed",
+              "positionX": 70,
+              "positionY": 420,
+              "lineLength": 48
+            }
+          ]
+        },
+        "options": {
+          "fileName": "post.png",
+          "format": "png"
+        }
+      },
+      "id": "f733bf7b-7077-49c6-a2c1-e9129276b288",
+      "name": "Edit Image",
+      "type": "n8n-nodes-base.editImage",
+      "typeVersion": 1,
+      "position": [
+        928,
+        -432
+      ]
+    },
+    {
+      "parameters": {
+        "content": "Triggger",
+        "height": 464
+      },
+      "id": "b268d62f-50cf-4288-9a5c-d9c7a0219759",
+      "name": "Sticky Note",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -480,
+        -592
+      ]
+    },
+    {
+      "parameters": {
+        "content": "Action",
+        "height": 400,
+        "width": 784,
+        "color": 6
+      },
+      "id": "01f604c4-a17e-4614-b7a9-66ff43fe2a5e",
+      "name": "Sticky Note1",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        448,
+        -160
+      ]
+    },
+    {
+      "parameters": {
+        "content": "Result",
+        "height": 400,
+        "width": 272,
+        "color": 4
+      },
+      "id": "720cd7d7-90a8-496e-a0a5-ec5b5c72d8cb",
+      "name": "Sticky Note2",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        1360,
+        -528
+      ]
+    },
+    {
+      "parameters": {
+        "mode": "combine",
+        "combineBy": "combineByPosition",
+        "options": {}
+      },
+      "id": "e114506e-c2b5-4914-98cf-a34083b6636c",
+      "name": "Merge",
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3.2,
+      "position": [
+        1216,
+        -288
+      ]
+    },
+    {
+      "parameters": {
+        "user": "ramkrishnaraj",
+        "platform": [
+          "linkedin",
+          "facebook",
+          "instagram"
+        ],
+        "title": "={{ $('review post').item.json.output }}",
+        "photos": "data",
+        "targetLinkedinPageId": "me",
+        "facebookPageId": "__manual_facebook__",
+        "facebookPageIdManual": "https://www.facebook.com/sivaramakrishna.ganapathiraju",
+        "facebookMediaTypePhoto": "STORIES"
+      },
+      "id": "96716697-2908-4e6f-8db9-92dc845a16be",
+      "name": "Upload photos",
+      "type": "n8n-nodes-upload-post.uploadPost",
+      "typeVersion": 1,
+      "position": [
+        1456,
+        -288
+      ],
+      "credentials": {
+        "uploadPostApi": {
+          "id": "60QwDu1wHVar5HCH",
+          "name": "Upload Post account 2"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Schedule Trigger": {
+      "main": [
+        [
+          {
+            "node": "Content generator",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Content generator": {
+      "main": [
+        [
+          {
+            "node": "linkedin post",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Content generator",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "linkedin post": {
+      "main": [
+        [
+          {
+            "node": "add hashtag to content",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model1": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "linkedin post",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "add hashtag to content": {
+      "main": [
+        [
+          {
+            "node": "review post",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Edit Image",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model3": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "add hashtag to content",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "review post": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "Google Gemini Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "review post",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Image": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Merge": {
+      "main": [
+        [
+          {
+            "node": "Upload photos",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate"
+  },
+  "versionId": "83643497-5a0a-4f10-ab27-15047a56ea65",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "37e6c0300fcbb40c69c2807c666cbdbc0495e991c59b00c1d31e75f78fde4214"
+  },
+  "nodeGroups": [],
+  "id": "wpRhsiOU2rM6t3DR",
+  "tags": []
+}

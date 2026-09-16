@@ -1,0 +1,95 @@
+{
+  "name": "samplegroqworkflow",
+  "nodes": [
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.chatTrigger",
+      "typeVersion": 1.4,
+      "position": [
+        -352,
+        0
+      ],
+      "id": "02218242-f8a2-4b2a-9d8e-81a87a9edf6b",
+      "name": "When chat message received",
+      "webhookId": "e2938b77-7130-42a2-b5f6-c83a748922d6"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3.1,
+      "position": [
+        -96,
+        0
+      ],
+      "id": "38d3c6be-0b37-42f8-a1ce-eb86b848542f",
+      "name": "AI Agent"
+    },
+    {
+      "parameters": {
+        "model": "openai/gpt-oss-20b",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGroq",
+      "typeVersion": 1,
+      "position": [
+        -240,
+        208
+      ],
+      "id": "8660aa50-a683-461e-884d-d1568e29871f",
+      "name": "Groq Chat Model",
+      "credentials": {
+        "groqApi": {
+          "id": "etjYPuaQMzFIJAfT",
+          "name": "Groq account"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "When chat message received": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent": {
+      "main": [
+        []
+      ]
+    },
+    "Groq Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate"
+  },
+  "versionId": "8736a71f-b87a-4b3e-a681-d4ffdf8c0422",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "6768007e3e4dea14f83d4a9f882ae3ae3f4dd216df5f5ab57c929326fa03a526"
+  },
+  "nodeGroups": [],
+  "id": "T5RBmMSzujbi3PC3",
+  "tags": []
+}

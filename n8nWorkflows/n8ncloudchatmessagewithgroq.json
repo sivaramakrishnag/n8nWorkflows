@@ -1,0 +1,147 @@
+{
+  "name": "n8ncloudchatmessagewithgroq",
+  "nodes": [
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3.1,
+      "position": [
+        -480,
+        -32
+      ],
+      "id": "6ca4e863-324c-4316-a617-e696c0ff50ee",
+      "name": "topicchoosingagent"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $json.output }}",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3.1,
+      "position": [
+        -224,
+        -32
+      ],
+      "id": "63774966-3ff8-4a2f-931b-c12c8499d39e",
+      "name": "topicfinalizer"
+    },
+    {
+      "parameters": {
+        "model": "openai/gpt-oss-120b",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGroq",
+      "typeVersion": 1,
+      "position": [
+        -480,
+        80
+      ],
+      "id": "5270ef1a-a5fe-4a3d-bf39-6f40f1cc173d",
+      "name": "Groq Chat Model",
+      "credentials": {
+        "groqApi": {
+          "id": "Sr9FCF0KshOg5L9p",
+          "name": "Groq account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.chatTrigger",
+      "typeVersion": 1.5,
+      "position": [
+        -672,
+        -32
+      ],
+      "id": "39e86c2f-c2a3-47b5-a3b6-31aa4ccc3c00",
+      "name": "When chat message received",
+      "webhookId": "32eb286c-7940-4317-beda-adb7990c2fdb"
+    },
+    {
+      "parameters": {
+        "model": "openai/gpt-oss-safeguard-20b",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGroq",
+      "typeVersion": 1,
+      "position": [
+        -224,
+        128
+      ],
+      "id": "f5ef455d-de84-40c4-9f20-35d888e6cfa2",
+      "name": "Groq Chat Model1",
+      "credentials": {
+        "groqApi": {
+          "id": "Sr9FCF0KshOg5L9p",
+          "name": "Groq account"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "topicchoosingagent": {
+      "main": [
+        [
+          {
+            "node": "topicfinalizer",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Groq Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "topicchoosingagent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "When chat message received": {
+      "main": [
+        [
+          {
+            "node": "topicchoosingagent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Groq Chat Model1": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "topicfinalizer",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate"
+  },
+  "versionId": "6e3e17a9-0593-4bc6-9f90-7877ee26363e",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "37e6c0300fcbb40c69c2807c666cbdbc0495e991c59b00c1d31e75f78fde4214"
+  },
+  "nodeGroups": [],
+  "id": "ZztlzhMOELfyokhn",
+  "tags": []
+}

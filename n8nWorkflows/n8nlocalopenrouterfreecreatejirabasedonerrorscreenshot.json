@@ -1,0 +1,224 @@
+{
+  "name": "n8nlocalopenrouterfreecreatejirabasedonerrorscreenshot",
+  "nodes": [
+    {
+      "parameters": {
+        "options": {
+          "allowFileUploads": true
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.chatTrigger",
+      "typeVersion": 1.4,
+      "position": [
+        -560,
+        -16
+      ],
+      "id": "e430ea2a-ccec-4837-89d6-1df5a5b63627",
+      "name": "When chat message received",
+      "webhookId": "8b166873-14aa-4221-8ab2-b13858e1c5f5"
+    },
+    {
+      "parameters": {
+        "options": {
+          "systemMessage": "You are a QA Engineer creating Jira bug reports from error screenshots.\n\nAnalyze the uploaded error screenshot.\n\nReturn the result in exactly this format:\n\nSUMMARY: <short Jira bug title>\n\nDESCRIPTION:\nError observed:\n<describe the error>\n\nProbable root cause:\n<describe the probable root cause>\n\nExpected result:\n<describe the expected behavior>\n\nActual result:\n<describe the actual behavior>\n\nTechnical details:\n<include important error messages, tools, versions, paths, or other technical information visible in the screenshot>\n\nRules:\n- SUMMARY must be concise and specific, maximum 100 characters.\n- Generate a different summary appropriate to each screenshot.\n- Use plain text only.\n- Do NOT use Markdown.\n- Do NOT use asterisks (*).\n- Do NOT use backticks (`).\n- Do NOT use # headings.\n- Do NOT use Markdown bold or italic formatting.\n- Do NOT surround commands, errors, paths, or technical terms with special characters.\n- Keep the description professional and easy to read in Jira.\n- Do not invent information that is not visible in the screenshot."
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3.1,
+      "position": [
+        -352,
+        -16
+      ],
+      "id": "1adc6b4d-c019-495c-9123-434aa6119c32",
+      "name": "AI Agent"
+    },
+    {
+      "parameters": {
+        "project": {
+          "__rl": true,
+          "value": "10000",
+          "mode": "list",
+          "cachedResultName": "RamakrishnaG TTA space"
+        },
+        "issueType": {
+          "__rl": true,
+          "value": "10039",
+          "mode": "list",
+          "cachedResultName": "Bug"
+        },
+        "summary": "={{ $json.output.match(/SUMMARY:\\s*(.*)/)?.[1]?.trim() || \"Bug reported from screenshot\" }}",
+        "additionalFields": {
+          "description": "={{ $json.output.replace(/^[\\s\\S]*?DESCRIPTION:\\s*/i, '').trim() }}"
+        }
+      },
+      "type": "n8n-nodes-base.jira",
+      "typeVersion": 1,
+      "position": [
+        0,
+        -16
+      ],
+      "id": "cc40a463-2db3-44e3-9bde-7a71ece9d105",
+      "name": "Create an issue",
+      "credentials": {
+        "jiraSoftwareCloudApi": {
+          "id": "Z1l9qcdTVKGYltRF",
+          "name": "Jira SW Cloud account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "model": "openrouter/free",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenRouter",
+      "typeVersion": 1,
+      "position": [
+        -352,
+        112
+      ],
+      "id": "72b8b363-07b1-452d-8595-b8966388ba8a",
+      "name": "OpenRouter Chat Model",
+      "credentials": {
+        "openRouterApi": {
+          "id": "W6nSH1sYiM28S0RL",
+          "name": "OpenRouter account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "mode": "combine",
+        "combineBy": "combineByPosition",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3.2,
+      "position": [
+        176,
+        176
+      ],
+      "id": "40528cfd-234e-4061-801a-627e430c2beb",
+      "name": "Merge"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "=https://ramkrishnaraj.atlassian.net/rest/api/3/issue/{{ $('Create an issue').item.json.key }}/attachments",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "jiraSoftwareCloudApi",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "X-Atlassian-Token",
+              "value": "no-check"
+            }
+          ]
+        },
+        "sendBody": true,
+        "contentType": "multipart-form-data",
+        "bodyParameters": {
+          "parameters": [
+            {
+              "parameterType": "formBinaryData",
+              "name": "file",
+              "inputDataFieldName": "data0"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.5,
+      "position": [
+        288,
+        -16
+      ],
+      "id": "145931ab-8ccb-477e-bafe-6e7733089e79",
+      "name": "HTTP Request to add an attachment to issue",
+      "credentials": {
+        "jiraSoftwareCloudApi": {
+          "id": "Z1l9qcdTVKGYltRF",
+          "name": "Jira SW Cloud account 2"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "When chat message received": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "AI Agent": {
+      "main": [
+        [
+          {
+            "node": "Create an issue",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenRouter Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create an issue": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Merge": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request to add an attachment to issue",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate"
+  },
+  "versionId": "550efd85-664c-49ff-a9d1-24f1fcda4d30",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "6768007e3e4dea14f83d4a9f882ae3ae3f4dd216df5f5ab57c929326fa03a526"
+  },
+  "nodeGroups": [],
+  "id": "DI9ttKhqwZGVY21t",
+  "tags": []
+}
